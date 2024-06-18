@@ -1,23 +1,27 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import ChatComponent from './components/ChatComponent';
+import Header from './components/Header';
+import FileTree from './components/FileTree';
+import './App.css'; // Add CSS for global styling
 
 function App() {
+  const [selectedFiles, setSelectedFiles] = useState([]);
+
+  const handleSelectFiles = (files) => {
+    setSelectedFiles(files);
+  };
+
+  const handleDeselectFile = (filePath) => {
+    setSelectedFiles(prevFiles => prevFiles.filter(file => file.path !== filePath));
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header />
+      <div className="main-content">
+        <FileTree onSelectFiles={handleSelectFiles} onDeselectFile={handleDeselectFile} selectedFilePaths={selectedFiles.map(file => file.path)} />
+        <ChatComponent selectedFiles={selectedFiles} onDeselectFile={handleDeselectFile} />
+      </div>
     </div>
   );
 }
