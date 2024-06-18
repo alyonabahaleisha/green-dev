@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import ChatComponent from './components/ChatComponent';
 import Header from './components/Header';
 import FileTree from './components/FileTree';
-import './App.css'; // Add CSS for global styling
+import './App.css';
 
 function App() {
   const [selectedFiles, setSelectedFiles] = useState([]);

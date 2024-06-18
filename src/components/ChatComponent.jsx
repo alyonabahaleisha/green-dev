@@ -3,25 +3,25 @@ import { useChatCompletion } from 'openai-streaming-hooks';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { coy, dark, atelierLakesideLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { darcula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import './ChatComponent.css';
 
 const ChatComponent = ({ selectedFiles, onDeselectFile }) => {
-  const [ms, setMessages] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [error, setError] = useState(null);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   const { messages: streamedMessages, submitPrompt, isLoading, error: chatError } = useChatCompletion({
-    model: 'gpt-4o', // Required
-    apiKey: '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', // Required
+    model: 'gpt-4o',
+    apiKey: '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',
     temperature: 0.9,
   });
 
   useEffect(() => {
     window.scrollTo(0, document.body.scrollHeight);
-  }, [ms]);
+  }, [messages]);
 
   useEffect(() => {
     if (chatError) {
@@ -46,17 +46,61 @@ const ChatComponent = ({ selectedFiles, onDeselectFile }) => {
         setIsStreaming(false);
       }
     }
-  }, [streamedMessages, isLoading])
+  }, [streamedMessages, isLoading]);
 
   const handleSendMessage = () => {
     if (input.trim() === '') return;
     const userMessage = { sender: 'user', text: input };
-    setMessages([...ms, userMessage]);
+    setMessages([...messages, userMessage]);
     setInput('');
     setIsStreaming(true);
 
     const combinedContext = `${input}\n\n${selectedFiles.map(file => file.content).join('\n\n')}`;
     submitPrompt([{ content: combinedContext, role: 'user' }]);
+  };
+
+  const handleCopy = (code) => {
+    navigator.clipboard.writeText(code);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  const renderMessageContent = (text) => {
+    const codeBlockRegex = /```(\w*)\n([\s\S]+?)```/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = codeBlockRegex.exec(text)) !== null) {
+      const [fullMatch, lang, code] = match;
+      const index = match.index;
+
+      if (index > lastIndex) {
+        parts.push(<ReactMarkdown key={lastIndex} remarkPlugins={[remarkGfm]}>{text.substring(lastIndex, index)}</ReactMarkdown>);
+      }
+
+      parts.push(
+        <div key={index} className="code-block">
+          <div className="code-block-header">
+            <span className="language-label">{lang || 'text'}</span>
+            <button onClick={() => handleCopy(code)}>
+              {isCopied ? 'Copied!' : 'Copy Code'}
+            </button>
+          </div>
+          <SyntaxHighlighter style={darcula} language={lang || 'text'} PreTag="div">
+            {code}
+          </SyntaxHighlighter>
+        </div>
+      );
+
+      lastIndex = index + fullMatch.length;
+    }
+
+    if (lastIndex < text.length) {
+      parts.push(<ReactMarkdown key={lastIndex} remarkPlugins={[remarkGfm]}>{text.substring(lastIndex)}</ReactMarkdown>);
+    }
+
+    return parts;
   };
 
   return (
@@ -70,24 +114,9 @@ const ChatComponent = ({ selectedFiles, onDeselectFile }) => {
         ))}
       </div>
       <div className="messages">
-        {ms.map((msg, index) => (
+        {messages.map((msg, index) => (
           <div key={index} className={`message ${msg.sender}`}>
-            <ReactMarkdown
-              children={msg.text}
-              remarkPlugins={[remarkGfm]}
-              components={{code({ children, language, value, ...rest}) {return(
-                <div style={{ position: 'relative', paddingTop: "10px", backgroundColor: "#f5f5f5", borderRadius: "8px" }}>
-                  <CopyToClipboard text={children}>
-                    <button className="copy-button" style={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }}>
-                      Copy
-                    </button>
-                  </CopyToClipboard>
-                  <SyntaxHighlighter language={language} style={atelierLakesideLight}>
-                    {children}
-                  </SyntaxHighlighter>
-                </div>
-              )}}}
-            />
+            {renderMessageContent(msg.text)}
           </div>
         ))}
         {isStreaming && <div className="message bot">...</div>}

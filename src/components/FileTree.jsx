@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './FileTree.css';
+
+// Using Font Awesome Icons for folder and file representation
+import { FaFolder, FaFolderOpen, FaFile } from 'react-icons/fa'; 
 import Spinner from './Spinner';
 
 const FileTree = ({ onSelectFiles, onDeselectFile, selectedFilePaths }) => {
@@ -10,22 +13,19 @@ const FileTree = ({ onSelectFiles, onDeselectFile, selectedFilePaths }) => {
   const [ignoreRules, setIgnoreRules] = useState([]);
 
   useEffect(() => {
-    if (directoryHandle) {
-      refetchDirectory(directoryHandle);
-    }
+    if (directoryHandle) refetchDirectory(directoryHandle);
   }, [directoryHandle]);
 
   const handleDirectoryPicker = async () => {
     try {
       const handle = await window.showDirectoryPicker();
       setDirectoryHandle(handle);
-      await refetchDirectory(handle);
     } catch (error) {
       console.error('Error accessing directory:', error);
     }
   };
 
-  const refetchDirectory = async (handle) => {
+  const refetchDirectory = useCallback(async (handle) => {
     setIsLoading(true);
     try {
       const rules = await readGitignore(handle);
@@ -37,7 +37,7 @@ const FileTree = ({ onSelectFiles, onDeselectFile, selectedFilePaths }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   const readGitignore = async (directoryHandle) => {
     try {
@@ -55,46 +55,23 @@ const FileTree = ({ onSelectFiles, onDeselectFile, selectedFilePaths }) => {
     const entries = [];
     for await (const entry of directoryHandle.values()) {
       const entryPath = `${parentPath}/${entry.name}`;
-      if (ignoreRules.some(rule => entryPath.includes(rule))) {
-        continue;
-      }
+      if (ignoreRules.some(rule => entryPath.includes(rule))) continue;
+
       if (entry.kind === 'directory') {
-        entries.push({
-          name: entry.name,
-          type: 'directory',
-          children: await readDirectory(entry, ignoreRules, entryPath),
-        });
+        const children = await readDirectory(entry, ignoreRules, entryPath);
+        entries.push({ name: entry.name, type: 'directory', children });
       } else {
         const fileContent = await entry.getFile().then(file => file.text());
-        entries.push({
-          name: entry.name,
-          type: 'file',
-          content: fileContent,
-          path: entryPath
-        });
+        entries.push({ name: entry.name, type: 'file', content: fileContent, path: entryPath });
       }
     }
-    return entries.sort((a, b) => {
-      if (a.type === b.type) {
-        return a.name.localeCompare(b.name);
-      }
-      return a.type === 'directory' ? -1 : 1;
-    });
+    return entries.sort((a, b) => (a.type === b.type ? a.name.localeCompare(b.name) : a.type === 'directory' ? -1 : 1));
   };
 
-  const toggleFolder = (path) => {
-    setExpandedFolders((prev) => ({
-      ...prev,
-      [path]: !prev[path],
-    }));
-  };
+  const toggleFolder = (path) => setExpandedFolders(prev => ({ ...prev, [path]: !prev[path] }));
 
   const handleFileClick = (file) => {
-    if (!selectedFilePaths.includes(file.path)) {
-      onSelectFiles(prev => [...prev, file]);
-    } else {
-      onDeselectFile(file.path);
-    }
+    selectedFilePaths.includes(file.path) ? onDeselectFile(file.path) : onSelectFiles(prev => [...prev, file]);
   };
 
   const renderTree = (nodes, parentPath = '') => (
@@ -109,7 +86,7 @@ const FileTree = ({ onSelectFiles, onDeselectFile, selectedFilePaths }) => {
                   className={`folder ${expandedFolders[currentPath] ? 'expanded' : ''}`}
                   onClick={() => toggleFolder(currentPath)}
                 >
-                  {node.name}
+                  {expandedFolders[currentPath] ? <FaFolderOpen /> : <FaFolder />} {node.name}
                 </span>
                 {expandedFolders[currentPath] && renderTree(node.children, currentPath)}
               </>
@@ -118,7 +95,7 @@ const FileTree = ({ onSelectFiles, onDeselectFile, selectedFilePaths }) => {
                 className={`file ${selectedFilePaths.includes(node.path) ? 'selected' : ''}`}
                 onClick={() => handleFileClick(node)}
               >
-                {node.name}
+                <FaFile /> {node.name}
               </span>
             )}
           </li>
@@ -130,20 +107,13 @@ const FileTree = ({ onSelectFiles, onDeselectFile, selectedFilePaths }) => {
   return (
     <div className="filetree-container">
       <h3>Project File Tree</h3>
-      {fileTree.length === 0 && (
-        <button className="select-directory" onClick={handleDirectoryPicker}>Select Directory</button>
-      )}
-      {fileTree.length > 0 && (
-        <button className="refetch-directory" onClick={() => refetchDirectory(directoryHandle)}>Refetch Directory</button>
+      {fileTree.length === 0 ? (
+        <button className="btn directory-picker" onClick={handleDirectoryPicker}>Select Directory</button>
+      ) : (
+        <button className="btn refetch-directory" onClick={() => refetchDirectory(directoryHandle)}>Refetch Directory</button>
       )}
       <div className="file-tree">
-        {isLoading ? (
-          <Spinner />
-        ) : fileTree.length > 0 ? (
-          renderTree(fileTree)
-        ) : (
-          <p>No directory selected</p>
-        )}
+        {isLoading ? <Spinner /> : fileTree.length > 0 ? renderTree(fileTree) : <p>No directory selected</p>}
       </div>
     </div>
   );

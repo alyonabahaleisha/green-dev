@@ -1,34 +1,44 @@
+/* Container Styling */
 .filetree-container {
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
   padding: 20px;
   width: 300px;
-  background-color: #f9f9f9;
+  background-color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* Header Styling */
 .filetree-container h3 {
   margin-bottom: 20px;
-  font-size: 18px;
-  color: #333;
+  font-size: 22px;
+  color: #24292e;
+  font-weight: 600;
 }
 
-.select-directory {
+/* Button Styling */
+.btn {
   margin-bottom: 20px;
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: #0366d6;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 14px;
+  transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
 }
 
-.select-directory:hover {
+.btn:hover {
   background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(0);
 }
 
 .file-tree {
@@ -37,60 +47,55 @@
   max-height: 400px;
 }
 
+/* Folder Styling */
 .folder {
   font-weight: bold;
   margin-top: 10px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  color: #0366d6;
 }
 
-.folder.expanded::before {
-  content: '📂';
-  margin-right: 5px;
+.folder:hover {
+  background-color: #f1f8ff;
 }
 
-.folder::before {
-  content: '📁';
-  margin-right: 5px;
+/* Folder Icon Styling */
+.folder svg {
+  margin-right: 8px;
 }
 
+/* File Styling */
 .file {
   margin-left: 20px;
   margin-top: 5px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  color: #586069;
 }
 
+.file:hover {
+  background-color: #f6f8fa;
+}
+
+/* File Icon Styling */
+.file svg {
+  margin-right: 8px;
+}
+
+/* Selected File Styling */
 .file.selected {
-  background-color: #e0e0e0;
+  background-color: #e1f3d8;
   border-radius: 3px;
-}
-
-.file::before {
-  content: '📄';
-  margin-right: 5px;
+  color: #22863a;
 }
 
 ul {
   list-style-type: none;
   padding-left: 20px;
   margin: 0;
-}
-
-.file-tag {
-  display: inline-block;
-  padding: 5px 10px;
-  background-color: #007bff;
-  color: white;
-  border-radius: 3px;
-  margin-right: 10px;
-  position: relative;
-}
-
-.deselect-file {
-  background: none;
-  border: none;
-  color: white;
-  margin-left: 5px;
-  cursor: pointer;
 }
