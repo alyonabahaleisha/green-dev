@@ -118,8 +118,7 @@
 
   .selected-files {
     padding: 10px;
-    background-color: #f1f1f1;
-    border-bottom: 1px solid #ccc;
+    background-color: #fff;
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
