@@ -20,40 +20,20 @@ code {
   width: 100%;
 }
 
-.header-container {
-  flex: 0 0 auto;
-  background-color: #007bff;
-  color: white;
-}
-
-.main-content {
-  display: flex;
-  flex: 1 1 auto;
-  padding: 20px;
-  background-color: #f0f2f5;
-  overflow: hidden;
-}
-
 /* Header Styles */
 .header-container {
+  flex: 0 0 auto;
+  background-color: #fff;
+  color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
+  padding: 20px;
 }
 
-.header-left,
-.header-right {
+.header-left, .header-right {
   display: flex;
   align-items: center;
-}
-
-.project-dropdown {
-  display: flex;
-  align-items: center;
-  font-size: 16px;
-  font-weight: bold;
-  color: white;
 }
 
 .nav-link {
@@ -65,6 +45,14 @@ code {
 
 .nav-link:hover {
   text-decoration: underline;
+}
+
+.project-dropdown {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #2196F3;
 }
 
 .profile-icon {
@@ -81,96 +69,89 @@ code {
   object-fit: cover;
 }
 
-/* File Tree Container */
+/* Main Content */
+.main-content {
+  display: flex;
+  flex: 1 1 auto;
+  padding: 20px;
+  background-color: #f0f2f5;
+  overflow: hidden;
+}
+
+/* File Tree Styles */
 .filetree-container {
   flex: 0 0 250px;
   margin-right: 20px;
   overflow-y: auto;
-  border: 1px solid #ccc;
   border-radius: 5px;
   background-color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* File Tree Header */
 .filetree-container h3 {
-  margin-bottom: 20px;
-  font-size: 22px;
+  margin: 5px 0;
+  font-size: 15px;
   color: #24292e;
   font-weight: bold;
 }
 
-/* File Tree Button */
 .btn {
-  margin-bottom: 20px;
+  margin: 20px auto;
   padding: 10px 20px;
-  background-color: #0366d6;
+  background-color: #616161;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+  box-shadow: 0em 0 5px #558B2F;
 }
 
 .btn:hover {
-  background-color: #0056b3;
-  transform: translateY(-2px);
+  background-color: #45a049;
 }
 
 .file-tree {
   width: 100%;
   overflow-y: auto;
-  max-height: 400px;
 }
 
-/* Folder Styles */
-.folder {
-  font-weight: bold;
-  margin-top: 10px;
+/* Folder and File Styles */
+.folder, .file {
+  margin-top: 6px;
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s;
   display: flex;
   align-items: center;
-  color: #0366d6;
 }
 
 .folder:hover {
   background-color: #f1f8ff;
 }
 
-.folder svg {
+.folder svg, .file svg {
   margin-right: 8px;
 }
 
-/* File Styles */
 .file {
-  margin-left: 20px;
+  padding-left: 8px;
   margin-top: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
-  display: flex;
-  align-items: center;
-  color: #586069;
+  color: #424242;
 }
 
 .file:hover {
   background-color: #f6f8fa;
 }
 
-.file svg {
-  margin-right: 8px;
-}
-
 .file.selected {
-  background-color: #e1f3d8;
+  background-color: #f8fcf7;
   border-radius: 3px;
-  color: #22863a;
+  color: #4d7e4d;;
 }
 
 ul {
   list-style-type: none;
-  padding-left: 20px;
+  padding-left: 0;
   margin: 0;
 }
 
@@ -180,7 +161,6 @@ ul {
   height: calc(100% - 41px);
   display: flex;
   flex-direction: column;
-  border: 1px solid #ccc;
   border-radius: 5px;
   background-color: #ffffff;
   overflow: hidden;
@@ -208,7 +188,6 @@ ul {
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 1em;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .messages {
@@ -216,40 +195,21 @@ ul {
   overflow-y: auto;
   padding: 10px;
   background-color: #f8f8f8;
+  margin: 5px 0;
+  border-radius: 5px;
+  color: #333;
 }
 
 .message {
   margin: 10px 0;
   padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.message.user {
-  background-color: #007bff;
-  color: #fff;
-  align-self: flex-end;
-  text-align: right;
+  border-radius: 16px;
+  background-color: #fff;
 }
 
 .message.bot {
-  background-color: #e2e2e2;
   align-self: flex-start;
   text-align: left;
-}
-
-.dropzone {
-  padding: 20px;
-  border: 2px dashed #ccc;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  text-align: center;
-  background-color: #f1f1f1;
-  cursor: pointer;
-}
-
-.dropzone:hover {
-  background-color: #e1e1e1;
 }
 
 /* Selected Files */
@@ -266,15 +226,18 @@ ul {
   padding: 10px;
   background-color: #f1f1f1;
   border-bottom: 1px solid #ccc;
+  position: relative;
 }
 
 .file-tag {
   display: inline-block;
-  padding: 5px 10px;
-  background-color: #007bff;
+  background-color: #586069;
   color: white;
-  border-radius: 3px;
-  margin-right: 10px;
+  margin-right: 2px;
+  position: relative;
+  padding: 2px 10px;
+  padding-right: 24px;
+  border-radius: 12px;
 }
 
 .copy-button {
@@ -284,10 +247,21 @@ ul {
   cursor: pointer;
 }
 
+.deselect-file {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  position: absolute;
+  top: 3px;
+  right: 4px;
+}
+
+/* Input Container */
 .input-container {
   display: flex;
   align-items: center;
-  padding: 10px;
+  padding: 0;
 }
 
 .input-container input {
@@ -297,21 +271,21 @@ ul {
   border-radius: 5px;
   margin-right: 10px;
   font-size: 16px;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .input-container button {
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: #616161;
   color: #fff;
   border: none;
   border-radius: 5px;
   font-size: 16px;
   cursor: pointer;
+  box-shadow: 0em 0 5px #558B2F;
 }
 
 .input-container button:hover {
-  background-color: #0056b3;
+  background-color: #45a049;
 }
 
 .error {
@@ -364,8 +338,7 @@ ul {
   margin: 100px auto;
 }
 
-.double-bounce1,
-.double-bounce2 {
+.double-bounce1, .double-bounce2 {
   width: 100%;
   height: 100%;
   border-radius: 50%;
@@ -388,11 +361,4 @@ ul {
   50% {
     transform: scale(1.0);
   }
-}
-
-.deselect-file {
-  background: none;
-    border: none;
-    cursor: pointer;
-    color: #fff;
 }

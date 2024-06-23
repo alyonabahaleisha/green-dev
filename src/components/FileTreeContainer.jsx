@@ -1,18 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import FileTreeHeader from './FileTreeHeader';
+import FileTreeList from './FileTreeList';
+import Spinner from './Spinner';
 import './FileTree.css';
 
-// Using Font Awesome Icons for folder and file representation
-import { FaFolder, FaFolderOpen, FaFile, FaSync } from 'react-icons/fa'; 
-import { BiChevronRight, BiChevronDown } from "react-icons/bi";
-import { LuFolderSync } from "react-icons/lu";
-import Spinner from './Spinner';
-
-const FileTree = ({ onSelectFiles, onDeselectFile, selectedFilePaths }) => {
+const FileTreeContainer = ({ onSelectFiles, onDeselectFile, selectedFilePaths }) => {
   const [fileTree, setFileTree] = useState([]);
   const [expandedFolders, setExpandedFolders] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [directoryHandle, setDirectoryHandle] = useState(null);
-  const [ignoreRules, setIgnoreRules] = useState([]);
 
   useEffect(() => {
     if (directoryHandle) refetchDirectory(directoryHandle);
@@ -31,7 +27,6 @@ const FileTree = ({ onSelectFiles, onDeselectFile, selectedFilePaths }) => {
     setIsLoading(true);
     try {
       const rules = await readGitignore(handle);
-      setIgnoreRules(rules);
       const tree = await readDirectory(handle, rules);
       setFileTree(tree);
     } catch (error) {
@@ -70,61 +65,28 @@ const FileTree = ({ onSelectFiles, onDeselectFile, selectedFilePaths }) => {
     return entries.sort((a, b) => (a.type === b.type ? a.name.localeCompare(b.name) : a.type === 'directory' ? -1 : 1));
   };
 
-  const toggleFolder = (path) => setExpandedFolders(prev => ({ ...prev, [path]: !prev[path] }));
-
-  const handleFileClick = (file) => {
-    selectedFilePaths.includes(file.path) ? onDeselectFile(file.path) : onSelectFiles(prev => [...prev, file]);
-  };
-
-  const renderTree = (nodes, level = 0, parentPath = '') => (
-    <ul data-level={level}>
-      {nodes.map((node, index) => {
-        const currentPath = `${parentPath}/${node.name}`;
-        return (
-          <li key={index}>
-            {node.type === 'directory' ? (
-              <>
-                <span
-                  className={`folder ${expandedFolders[currentPath] ? 'expanded' : ''}`}
-                  onClick={() => toggleFolder(currentPath)}
-                >
-                  {expandedFolders[currentPath] ? <BiChevronDown /> : <BiChevronRight />} {node.name}
-                </span>
-                {expandedFolders[currentPath] && renderTree(node.children, level + 1, currentPath)}
-              </>
-            ) : (
-              <span
-                className={`file ${selectedFilePaths.includes(node.path) ? 'selected' : ''}`}
-                onClick={() => handleFileClick(node)}
-              >
-                {node.name}
-              </span>
-            )}
-          </li>
-        );
-      })}
-    </ul>
-  );  
-
   return (
     <div className="filetree-container">
-      <div className="filetree-header">
-        <h3>Project File Tree</h3>
-        {fileTree.length !== 0 && (
-          <button className="btn refetch-directory" onClick={() => refetchDirectory(directoryHandle)}>
-            <LuFolderSync />
-          </button>
-        )}
-      </div>
+      <FileTreeHeader fileTreeLength={fileTree.length} onRefetch={() => refetchDirectory(directoryHandle)} />
       {fileTree.length === 0 ? (
         <button className="btn directory-picker" onClick={handleDirectoryPicker}>Select Directory</button>
       ) : (
         <div className="file-tree">
-          {isLoading ? <Spinner /> : fileTree.length > 0 ? renderTree(fileTree) : <p>No directory selected</p>}
+          {isLoading ? <Spinner /> : fileTree.length > 0 ? (
+            <FileTreeList
+              nodes={fileTree}
+              expandedFolders={expandedFolders}
+              toggleFolder={(path) => setExpandedFolders(prev => ({ ...prev, [path]: !prev[path] }))}
+              handleFileClick={handleFileClick}
+              selectedFilePaths={selectedFilePaths}
+              onSelectFiles={onSelectFiles}
+              onDeselectFile={onDeselectFile}
+            />
+          ) : <p>No directory selected</p>}
         </div>
       )}
     </div>
   );
 };
 
-export default FileTree;
+export default FileTreeContainer;

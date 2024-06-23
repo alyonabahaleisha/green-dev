@@ -13,7 +13,7 @@ const ChatComponent = ({ selectedFiles, onDeselectFile }) => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
 
-  const { messages: streamedMessages, submitPrompt, isLoading, error: chatError } = useChatCompletion({
+  const { messages: streamedMessages, resetMessages, submitPrompt, loading: isLoading, error: chatError } = useChatCompletion({
     model: 'gpt-4o',
     apiKey: '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',
     temperature: 0.9,
@@ -26,7 +26,8 @@ const ChatComponent = ({ selectedFiles, onDeselectFile }) => {
   useEffect(() => {
     if (chatError) {
       setError(chatError.message);
-      setIsStreaming(false);
+      // Log the error, but do not stop streaming
+      console.error("Chat error:", chatError.message);
     }
   }, [chatError]);
 
@@ -55,8 +56,13 @@ const ChatComponent = ({ selectedFiles, onDeselectFile }) => {
     setInput('');
     setIsStreaming(true);
 
-    const combinedContext = `${input}\n\n${selectedFiles.map(file => file.content).join('\n\n')}`;
+    const combinedContext = `${input}\n\n${selectedFiles.map(file => file.name + file.content).join('\n\n')}`;
     submitPrompt([{ content: combinedContext, role: 'user' }]);
+  };
+
+  const handleClearChat = () => {
+    resetMessages();
+    setMessages([]);
   };
 
   const handleCopy = (code) => {
@@ -105,22 +111,24 @@ const ChatComponent = ({ selectedFiles, onDeselectFile }) => {
 
   return (
     <div className="chat-container">
-      <div className="selected-files">
-        {selectedFiles.map((file, index) => (
-          <span key={index} className="file-tag">
-            {file.name}
-            <button className="deselect-file" onClick={() => onDeselectFile(file.path)}>x</button>
-          </span>
-        ))}
-      </div>
-      <div className="messages">
-        {messages.map((msg, index) => (
-          <div key={index} className={`message ${msg.sender}`}>
-            {renderMessageContent(msg.text)}
-          </div>
-        ))}
-        {isStreaming && <div className="message bot">...</div>}
-      </div>
+      {selectedFiles?.length ? 
+        <div className="selected-files">
+          {selectedFiles.map((file, index) => (
+            <span key={index} className="file-tag">
+              {file.name}
+              <button className="deselect-file" onClick={() => onDeselectFile(file.path)}>x</button>
+            </span>
+          ))}
+        </div>
+         :null}
+        <div className="messages">
+          {messages.map((msg, index) => (
+            <div key={index} className={`message ${msg.sender}`}>
+              {renderMessageContent(msg.text)}
+            </div>
+          ))}
+          {isStreaming && <div className="message bot">...</div>}
+        </div>
       {error && <div className="error">{error}</div>}
       <div className="input-container">
         <input
@@ -130,6 +138,7 @@ const ChatComponent = ({ selectedFiles, onDeselectFile }) => {
           placeholder="Enter user message..."
         />
         <button onClick={handleSendMessage} disabled={isStreaming}>Send</button>
+        <button onClick={handleClearChat}>Clear All</button>
       </div>
     </div>
   );

@@ -11,9 +11,7 @@ const Header = () => (
 
 const ProjectDropdown = () => (
   <div className="project-dropdown">
-    <span>Personal</span>
-    <span> / </span>
-    <span>Green Dev</span>
+    <span>GREENDEV.AI</span>
   </div>
 );
 
