@@ -6,6 +6,7 @@ import './App.css';
 
 function App() {
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [apiKey, setApiKey] = useState('');
 
   const handleSelectFiles = (files) => {
     setSelectedFiles(files);
@@ -15,12 +16,16 @@ function App() {
     setSelectedFiles(prevFiles => prevFiles.filter(file => file.path !== filePath));
   };
 
+  const handleApiKeyChange = (key) => {
+    setApiKey(key);
+  };
+
   return (
     <div className="App">
-      <Header />
+      <Header onApiKeyChange={handleApiKeyChange} />
       <div className="main-content">
         <FileTree onSelectFiles={handleSelectFiles} onDeselectFile={handleDeselectFile} selectedFilePaths={selectedFiles.map(file => file.path)} />
-        <ChatComponent selectedFiles={selectedFiles} onDeselectFile={handleDeselectFile} />
+        <ChatComponent selectedFiles={selectedFiles} onDeselectFile={handleDeselectFile} apiKey={apiKey} />
       </div>
     </div>
   );

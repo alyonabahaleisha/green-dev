@@ -6,7 +6,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { darcula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import './ChatComponent.css';
 
-const ChatComponent = ({ selectedFiles, onDeselectFile }) => {
+const ChatComponent = ({ selectedFiles, onDeselectFile, apiKey }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [error, setError] = useState(null);
@@ -15,7 +15,7 @@ const ChatComponent = ({ selectedFiles, onDeselectFile }) => {
 
   const { messages: streamedMessages, resetMessages, submitPrompt, loading: isLoading, error: chatError } = useChatCompletion({
     model: 'gpt-4o',
-    apiKey: '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',
+    apiKey: apiKey,
     temperature: 0.9,
   });
 
@@ -111,6 +111,7 @@ const ChatComponent = ({ selectedFiles, onDeselectFile }) => {
 
   return (
     <div className="chat-container">
+      {console.log('API key', apiKey)}
       {selectedFiles?.length ? 
         <div className="selected-files">
           {selectedFiles.map((file, index) => (
